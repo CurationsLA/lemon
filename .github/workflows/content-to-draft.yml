@@ -1,11 +1,11 @@
-name: CurationsLA Content to Ghost Draft
+name: "CurationsLA Content to Ghost Draft"
 
 on:
   push:
-    branches: [ main ]  # Trigger on push to main for testing
+    branches: [ main ]
   schedule:
-    - cron: '0 13 * * *'  # 6 AM PT daily
-  workflow_dispatch:  # Allow manual trigger
+    - cron: '0 13 * * *'
+  workflow_dispatch:
 
 jobs:
   deploy-and-source:
@@ -40,7 +40,7 @@ jobs:
           exit 1
         fi
         echo "✅ CLOUDFLARE_API_TOKEN is available"
-        npx wrangler deploy --compatibility-date=2024-01-01
+        npx wrangler deploy --env="" --compatibility-date=2024-01-01
         
     - name: Set Cloudflare Worker secrets
       env:
