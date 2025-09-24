@@ -307,7 +307,20 @@ async function createGhostDraft(request, env, corsHeaders) {
     }
 
     // Create Ghost Pro draft via Admin API
-    const jwt = generateGhostJWT(GHOST_ADMIN_API_KEY);
+    const jwt = await generateGhostJWT(GHOST_ADMIN_API_KEY);
+    console.log('[DEBUG] Ghost JWT generated, length:', jwt.length);
+    
+    const postData = {
+      posts: [{
+        title: title || `CurationsLA Draft - ${new Date().toLocaleDateString()}`,
+        html: html || '<p>Content sourced and ready for editing!</p>',
+        status: 'draft',
+        tags: ['curations-la', 'newsletter', ...tags]
+      }]
+    };
+    
+    console.log('[DEBUG] Posting to Ghost API:', `${GHOST_URL}/ghost/api/admin/posts/`);
+    console.log('[DEBUG] Post data:', JSON.stringify(postData, null, 2));
     
     const response = await fetch(`${GHOST_URL}/ghost/api/admin/posts/`, {
       method: 'POST',
@@ -315,21 +328,19 @@ async function createGhostDraft(request, env, corsHeaders) {
         'Authorization': `Ghost ${jwt}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ 
-        posts: [{
-          title: title || `CurationsLA Draft - ${new Date().toLocaleDateString()}`,
-          html: html || '<p>Content sourced and ready for editing!</p>',
-          status: 'draft',
-          tags: ['curations-la', 'newsletter', ...tags]
-        }]
-      })
+      body: JSON.stringify(postData)
     });
     
+    console.log('[DEBUG] Ghost API response status:', response.status);
+    
     if (!response.ok) {
-      throw new Error(`Ghost API error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('[DEBUG] Ghost API error response:', errorText);
+      throw new Error(`Ghost API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
     
     const result = await response.json();
+    console.log('[DEBUG] Ghost API success:', result);
     const post = result.posts[0];
 
     return new Response(JSON.stringify({
@@ -352,8 +363,8 @@ async function createGhostDraft(request, env, corsHeaders) {
   }
 }
 
-// Generate JWT for Ghost Admin API
-function generateGhostJWT(adminAPIKey) {
+// Generate JWT for Ghost Admin API with proper HMAC-SHA256
+async function generateGhostJWT(adminAPIKey) {
   // Split the key into ID and secret
   const [id, secret] = adminAPIKey.split(':');
   
@@ -370,14 +381,33 @@ function generateGhostJWT(adminAPIKey) {
     aud: '/admin/'
   };
   
-  // Base64url encode
+  // Base64url encode header and payload
   const encodedHeader = base64urlEscape(btoa(JSON.stringify(header)));
   const encodedPayload = base64urlEscape(btoa(JSON.stringify(payload)));
   
-  // Create signature (simplified - in production use proper crypto)
-  const signature = base64urlEscape(btoa(`${encodedHeader}.${encodedPayload}.${secret}`));
+  // Create message to sign
+  const message = `${encodedHeader}.${encodedPayload}`;
   
-  return `${encodedHeader}.${encodedPayload}.${signature}`;
+  // Import secret as crypto key
+  const keyData = new TextEncoder().encode(secret);
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw',
+    keyData,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  
+  // Sign the message
+  const messageData = new TextEncoder().encode(message);
+  const signatureBuffer = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
+  
+  // Convert signature to base64url
+  const signatureArray = new Uint8Array(signatureBuffer);
+  const signatureString = btoa(String.fromCharCode.apply(null, signatureArray));
+  const signature = base64urlEscape(signatureString);
+  
+  return `${message}.${signature}`;
 }
 
 function base64urlEscape(str) {
