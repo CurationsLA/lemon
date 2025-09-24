@@ -9,6 +9,7 @@ export default {
     const url = new URL(request.url);
     const pathname = url.pathname;
     const hostname = url.hostname;
+    const method = request.method;
 
     // CORS headers for API access
     const corsHeaders = {
@@ -46,17 +47,41 @@ export default {
         });
       }
 
-      // Content sourcing API endpoints
-      if (pathname === '/api/source-content' && request.method === 'POST') {
-        return await handleSourceContent(request, env, corsHeaders);
-      }
-
-      if (pathname === '/api/get-content' && request.method === 'GET') {
-        return await getSourcedContent(env, corsHeaders);
-      }
-
-      if (pathname === '/api/create-draft' && request.method === 'POST') {
-        return await createGhostDraft(request, env, corsHeaders);
+      // API ROUTES - More explicit pattern matching
+      if (pathname.startsWith('/api/')) {
+        console.log('[DEBUG] API route detected:', pathname, method);
+        
+        if (pathname === '/api/source-content' && method === 'POST') {
+          return await handleSourceContent(request, env, corsHeaders);
+        }
+        
+        if (pathname === '/api/get-content' && method === 'GET') {
+          return await getSourcedContent(env, corsHeaders);
+        }
+        
+        if (pathname === '/api/create-draft' && method === 'POST') {
+          return await createGhostDraft(request, env, corsHeaders);
+        }
+        
+        // Wrong method error
+        if (pathname === '/api/source-content' || pathname === '/api/create-draft') {
+          return new Response(JSON.stringify({
+            error: 'Method not allowed',
+            message: `Use POST method for ${pathname}`
+          }), {
+            status: 405,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        
+        // API 404
+        return new Response(JSON.stringify({
+          error: 'API endpoint not found',
+          path: pathname
+        }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
 
       // ============================================
