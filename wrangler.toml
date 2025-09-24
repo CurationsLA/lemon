@@ -5,11 +5,30 @@ account_id = "35d4cd8b7e16e06466013e4284554c62"
 
 [vars]
 PURPOSE = "content_sourcing_only"
-GHOST_API_URL = "https://curationsla-1.ghost.io"
+GHOST_SITE_URL = "https://curationsla-1.ghost.io"
 
 [[kv_namespaces]]
-binding = "CONTENT_KV"
-id = "create-new-kv-for-content"
+binding = "curationsla-content-storage"
+id = "06eade4515864540bacf4bdf0bcae045"
+
+# Routes for la.curations.cc
+routes = [
+  { pattern = "la.curations.cc/api/*", zone_name = "curations.cc" },
+  { pattern = "la.curations.cc/health", zone_name = "curations.cc" }
+]
 
 [triggers]
 crons = ["0 13 * * *"]  # 6 AM PT daily
+
+# Environment configurations
+[env.production]
+name = "curationsla-content-sourcer"
+routes = [
+  { pattern = "la.curations.cc/*", zone_name = "curations.cc" }
+]
+
+[env.staging]
+name = "curationsla-content-sourcer-staging"
+routes = [
+  { pattern = "staging-la.curations.cc/*", zone_name = "curations.cc" }
+]

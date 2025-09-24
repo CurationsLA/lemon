@@ -7,27 +7,66 @@
       "priority": "high"
     },
     {
-      "name": "LA Eater",
+      "name": "Eater LA",
       "url": "https://la.eater.com/rss/index.xml",
       "category": "food",
       "priority": "high"
     },
     {
       "name": "LAist",
-      "url": "https://laist.com/feeds/all.rss",
+      "url": "https://laist.com/feeds/articles.xml",
       "category": "news",
       "priority": "medium"
     },
     {
       "name": "TimeOut LA",
-      "url": "https://timeout.com/los-angeles/rss.xml",
+      "url": "https://www.timeout.com/los-angeles/rss.xml",
       "category": "events",
       "priority": "high"
+    },
+    {
+      "name": "Curbed LA",
+      "url": "https://la.curbed.com/rss/index.xml",
+      "category": "lifestyle",
+      "priority": "medium"
     }
   ],
-  "keywords": {
-    "positive": ["community", "art", "music", "food", "culture", "festival", "local", "creative"],
-    "banned": ["politics", "crime", "shooting", "controversy", "death", "accident", "arrest"]
+  "good_vibes_keywords": [
+    "celebrate", "celebration", "festival", "art", "music", "community", 
+    "opening", "new", "launch", "creative", "local", "neighborhood",
+    "culture", "food", "restaurant", "cafe", "market", "garden",
+    "park", "beach", "outdoors", "wellness", "fitness", "yoga",
+    "meditation", "mindfulness", "sustainability", "eco-friendly",
+    "volunteer", "charity", "nonprofit", "giving", "help", "support",
+    "innovation", "startup", "tech", "design", "fashion", "style",
+    "photography", "gallery", "museum", "theater", "performance",
+    "family", "kids", "education", "learning", "workshop", "class",
+    "free", "affordable", "discount", "deal", "special", "unique",
+    "award", "recognition", "achievement", "success", "milestone",
+    "collaboration", "partnership", "together", "unity", "diversity",
+    "inclusion", "pride", "heritage", "tradition", "history"
+  ],
+  "negative_keywords": [
+    "crime", "violence", "murder", "death", "accident", "crash",
+    "fire", "flood", "earthquake", "disaster", "emergency", "crisis",
+    "lawsuit", "arrest", "jail", "prison", "theft", "robbery",
+    "fraud", "scam", "controversy", "scandal", "protest", "riot",
+    "war", "conflict", "attack", "terrorism", "shooting", "stabbing",
+    "overdose", "drugs", "addiction", "homeless", "eviction",
+    "bankruptcy", "closure", "shutdown", "layoffs", "unemployment",
+    "recession", "depression", "inflation", "shortage", "strike",
+    "complaint", "violation", "fine", "penalty", "investigation",
+    "corruption", "bribery", "misconduct", "abuse", "harassment"
+  ],
+  "content_filters": {
+    "min_good_vibes_score": 2,
+    "max_negative_score": 0,
+    "required_la_keywords": [
+      "los angeles", "la", "hollywood", "beverly hills", "santa monica", 
+      "venice", "downtown", "west hollywood", "pasadena", "glendale", 
+      "burbank", "culver city", "manhattan beach", "redondo beach", 
+      "hermosa beach"
+    ]
   },
   "update_frequency": "daily",
   "good_vibes_only": true

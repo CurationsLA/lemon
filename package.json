@@ -1,17 +1,19 @@
 {
-  "name": "lemon",
+  "name": "curationsla-content-sourcer",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "CurationsLA content sourcing and Ghost Pro draft creation system",
+  "main": "src/content-sourcer.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy": "./deploy.sh",
+    "dev": "wrangler dev",
+    "preview": "wrangler deploy --dry-run"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CurationsLA/lemon.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["content-sourcing", "ghost-pro", "cloudflare-workers", "curations-la"],
+  "author": "CurationsLA",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/CurationsLA/lemon/issues"

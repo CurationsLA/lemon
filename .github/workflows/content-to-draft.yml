@@ -1,25 +1,53 @@
-name: Source Content and Create Ghost Draft
+name: CurationsLA Content to Ghost Draft
 
 on:
-  workflow_dispatch:
-    inputs:
-      publication_date:
-        description: 'Publication Date'
-        required: true
-        type: string
+  schedule:
+    - cron: '0 13 * * *'  # 6 AM PT daily
+  workflow_dispatch:  # Allow manual trigger
 
 jobs:
-  source-and-draft:
+  deploy-and-source:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
       
-      - name: Source LA Content
-        run: |
-          curl https://curationsla-content-sourcer.workers.dev/api/source-content
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install
       
-      - name: Create Ghost Draft
-        run: |
-          curl -X POST https://curationsla-content-sourcer.workers.dev/api/create-draft \
-            -H "Content-Type: application/json" \
-            -d '{"publicationDate": "${{ github.event.inputs.publication_date }}"}'
+    - name: Deploy Cloudflare Worker
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      run: |
+        npx wrangler deploy --compatibility-date=2024-01-01
+        
+    - name: Set Cloudflare Worker secrets
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        GHOST_ADMIN_API_KEY: ${{ secrets.GHOST_ADMIN_API_KEY }}
+      run: |
+        echo "$GHOST_ADMIN_API_KEY" | npx wrangler secret put GHOST_ADMIN_API_KEY
+        
+    - name: Trigger content sourcing
+      run: |
+        sleep 30  # Allow deployment to propagate
+        curl -X POST "https://la.curations.cc/api/source-content" \
+          -H "Content-Type: application/json" \
+          -d '{"trigger": "github-action"}'
+          
+    - name: Create Ghost draft from sourced content
+      run: |
+        sleep 10  # Allow content processing
+        curl -X POST "https://la.curations.cc/api/create-draft" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "title": "CurationsLA Good Vibes - '$(date +"%B %d, %Y")'",
+            "publicationDate": "'$(date +"%Y-%m-%d")'"
+          }'
