@@ -11,24 +11,11 @@ GHOST_SITE_URL = "https://curationsla-1.ghost.io"
 binding = "curationsla-content-storage"
 id = "06eade4515864540bacf4bdf0bcae045"
 
-# Routes for la.curations.cc
+# Routes for la.curations.cc - specific routes for API and health
 routes = [
   { pattern = "la.curations.cc/api/*", zone_name = "curations.cc" },
-  { pattern = "la.curations.cc/health", zone_name = "curations.cc" }
+  { pattern = "la.curations.cc/health*", zone_name = "curations.cc" }
 ]
 
 [triggers]
 crons = ["0 13 * * *"]  # 6 AM PT daily
-
-# Environment configurations
-[env.production]
-name = "curationsla-content-sourcer"
-routes = [
-  { pattern = "la.curations.cc/*", zone_name = "curations.cc" }
-]
-
-[env.staging]
-name = "curationsla-content-sourcer-staging"
-routes = [
-  { pattern = "staging-la.curations.cc/*", zone_name = "curations.cc" }
-]
