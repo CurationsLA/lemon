@@ -31,32 +31,30 @@ jobs:
       run: npm install
       
     - name: Deploy Cloudflare Worker
-      if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
       env:
         CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       run: |
         echo "Node version: $(node --version)"
-        echo "CLOUDFLARE_API_TOKEN is available"
+        if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+          echo "❌ CLOUDFLARE_API_TOKEN is not set"
+          exit 1
+        fi
+        echo "✅ CLOUDFLARE_API_TOKEN is available"
         npx wrangler deploy --compatibility-date=2024-01-01
         
     - name: Set Cloudflare Worker secrets
-      if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.GHOST_ADMIN_API_KEY != '' }}
       env:
         CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         GHOST_ADMIN_API_KEY: ${{ secrets.GHOST_ADMIN_API_KEY }}
       run: |
+        if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$GHOST_ADMIN_API_KEY" ]; then
+          echo "❌ Required secrets are missing:"
+          echo "CLOUDFLARE_API_TOKEN: $([[ -n "$CLOUDFLARE_API_TOKEN" ]] && echo "✅ Set" || echo "❌ Missing")"
+          echo "GHOST_ADMIN_API_KEY: $([[ -n "$GHOST_ADMIN_API_KEY" ]] && echo "✅ Set" || echo "❌ Missing")"
+          exit 1
+        fi
+        echo "✅ Setting Ghost Admin API key in Cloudflare Worker"
         echo "$GHOST_ADMIN_API_KEY" | npx wrangler secret put GHOST_ADMIN_API_KEY
-        
-    - name: Missing Secrets Warning
-      if: ${{ secrets.CLOUDFLARE_API_TOKEN == '' || secrets.GHOST_ADMIN_API_KEY == '' }}
-      run: |
-        echo "⚠️ Missing required secrets:"
-        echo "CLOUDFLARE_API_TOKEN: $([[ -n "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]] && echo "✅ Set" || echo "❌ Missing")"
-        echo "GHOST_ADMIN_API_KEY: $([[ -n "${{ secrets.GHOST_ADMIN_API_KEY }}" ]] && echo "✅ Set" || echo "❌ Missing")"
-        echo ""
-        echo "Please set these secrets in GitHub repository settings:"
-        echo "Settings → Secrets and variables → Actions → Repository secrets"
-        exit 1
         
     - name: Trigger content sourcing
       run: |
