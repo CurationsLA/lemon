@@ -23,7 +23,7 @@ lemon/
 
 ## Deployment
 
-### 1. Cloudflare Setup
+### 1. Cloudflare Setup (Updated API Permissions)
 ```bash
 # Deploy the content sourcing worker
 npm run deploy
