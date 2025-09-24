@@ -1,20 +1,19 @@
 name = "curationsla-content-sourcer"
-main = "src/content-sourcer.js"
+main = "src/curationsla-master-router.js"
 compatibility_date = "2024-01-01"
 account_id = "35d4cd8b7e16e06466013e4284554c62"
 
 [vars]
-PURPOSE = "content_sourcing_only"
+PURPOSE = "content_sourcing_and_seo_routing"
 GHOST_SITE_URL = "https://curationsla-1.ghost.io"
 
 [[kv_namespaces]]
 binding = "curationsla-content-storage"
 id = "06eade4515864540bacf4bdf0bcae045"
 
-# Routes for la.curations.cc - specific routes for API and health
+# Routes for la.curations.cc - handle ALL traffic (fixed domain blocking)
 routes = [
-  { pattern = "la.curations.cc/api/*", zone_name = "curations.cc" },
-  { pattern = "la.curations.cc/health*", zone_name = "curations.cc" }
+  { pattern = "la.curations.cc/*", zone_name = "curations.cc" }
 ]
 
 [triggers]
