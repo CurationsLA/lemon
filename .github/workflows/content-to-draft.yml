@@ -41,6 +41,8 @@ jobs:
         fi
         echo "✅ CLOUDFLARE_API_TOKEN is available"
         npx wrangler deploy --env="" --compatibility-date=2024-01-01
+        echo "✅ Checking deployed routes..."
+        npx wrangler route list
         
     - name: Set Cloudflare Worker secrets
       env:
