@@ -1,6 +1,8 @@
 name: CurationsLA Content to Ghost Draft
 
 on:
+  push:
+    branches: [ main ]  # Trigger on push to main for testing
   schedule:
     - cron: '0 13 * * *'  # 6 AM PT daily
   workflow_dispatch:  # Allow manual trigger
