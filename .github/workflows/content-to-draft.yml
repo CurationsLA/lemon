@@ -1,0 +1,25 @@
+name: Source Content and Create Ghost Draft
+
+on:
+  workflow_dispatch:
+    inputs:
+      publication_date:
+        description: 'Publication Date'
+        required: true
+        type: string
+
+jobs:
+  source-and-draft:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Source LA Content
+        run: |
+          curl https://curationsla-content-sourcer.workers.dev/api/source-content
+      
+      - name: Create Ghost Draft
+        run: |
+          curl -X POST https://curationsla-content-sourcer.workers.dev/api/create-draft \
+            -H "Content-Type: application/json" \
+            -d '{"publicationDate": "${{ github.event.inputs.publication_date }}"}'

@@ -1,0 +1,34 @@
+{
+  "rss_feeds": [
+    {
+      "name": "LA Taco",
+      "url": "https://lataco.com/rss",
+      "category": "food",
+      "priority": "high"
+    },
+    {
+      "name": "LA Eater",
+      "url": "https://la.eater.com/rss/index.xml",
+      "category": "food",
+      "priority": "high"
+    },
+    {
+      "name": "LAist",
+      "url": "https://laist.com/feeds/all.rss",
+      "category": "news",
+      "priority": "medium"
+    },
+    {
+      "name": "TimeOut LA",
+      "url": "https://timeout.com/los-angeles/rss.xml",
+      "category": "events",
+      "priority": "high"
+    }
+  ],
+  "keywords": {
+    "positive": ["community", "art", "music", "food", "culture", "festival", "local", "creative"],
+    "banned": ["politics", "crime", "shooting", "controversy", "death", "accident", "arrest"]
+  },
+  "update_frequency": "daily",
+  "good_vibes_only": true
+}

@@ -1,0 +1,15 @@
+name = "curationsla-content-sourcer"
+main = "src/content-sourcer.js"
+compatibility_date = "2024-01-01"
+account_id = "35d4cd8b7e16e06466013e4284554c62"
+
+[vars]
+PURPOSE = "content_sourcing_only"
+GHOST_API_URL = "https://curationsla-1.ghost.io"
+
+[[kv_namespaces]]
+binding = "CONTENT_KV"
+id = "create-new-kv-for-content"
+
+[triggers]
+crons = ["0 13 * * *"]  # 6 AM PT daily
