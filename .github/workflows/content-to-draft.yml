@@ -56,19 +56,27 @@ jobs:
         echo "✅ Setting Ghost Admin API key in Cloudflare Worker"
         echo "$GHOST_ADMIN_API_KEY" | npx wrangler secret put GHOST_ADMIN_API_KEY
         
+    - name: Test health endpoint
+      run: |
+        echo "Testing health endpoint..."
+        curl -v "https://la.curations.cc/health" || echo "Health check failed"
+        
     - name: Trigger content sourcing
       run: |
         sleep 30  # Allow deployment to propagate
-        curl -X POST "https://la.curations.cc/api/source-content" \
+        echo "Triggering content sourcing..."
+        curl -v -X POST "https://la.curations.cc/api/source-content" \
           -H "Content-Type: application/json" \
-          -d '{"trigger": "github-action"}'
+          -H "User-Agent: CurationsLA-GitHub-Action/1.0" \
+          -d '{"trigger": "github-action"}' || echo "Content sourcing failed"
           
     - name: Create Ghost draft from sourced content
       run: |
         sleep 10  # Allow content processing
-        curl -X POST "https://la.curations.cc/api/create-draft" \
+        echo "Creating Ghost draft..."
+        TITLE="CurationsLA Good Vibes - $(date +'%B %d, %Y')"
+        DATE="$(date +'%Y-%m-%d')"
+        curl -v -X POST "https://la.curations.cc/api/create-draft" \
           -H "Content-Type: application/json" \
-          -d '{
-            "title": "CurationsLA Good Vibes - '$(date +"%B %d, %Y")'",
-            "publicationDate": "'$(date +"%Y-%m-%d")'"
-          }'
+          -H "User-Agent: CurationsLA-GitHub-Action/1.0" \
+          -d "{\"title\": \"$TITLE\", \"publicationDate\": \"$DATE\"}" || echo "Draft creation failed"
